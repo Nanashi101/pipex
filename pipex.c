@@ -6,15 +6,40 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 18:06:43 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/22 18:34:51 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/22 19:02:35 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+char    *check_cmd_path(char **fullpath, char *path)
+{
+    int i;
+    
+    i = 0;
+    if (access(path, X_OK) == 0)
+        return (path);
+    path = strjoin("/", path);
+    while (fullpath[i])
+	{
+		fullpath[i] = ft_strjoin(fullpath[i], path);
+		if (access(fullpath[i], X_OK) == 0)
+			return (fullpath[i]);
+		i++;
+	}
+	return (NULL);
+}
 
 void    **executing_cmd1(j_dtin fd, char **av, j_dtin *pp, char **envp)
 {
     pp->cmd1 = ft_split(av[2], ' ');
+    pp->cmdpath = check_cmd_path(envp, pp->cmd1[0]);
+    if (pp->cmdpath == NULL)
+	{
+		perror("Command not found");
+		exit (1);
+	}
+    if (execve(pp->cmdpath, pp->cmd1, NULL) == -1)
+		perror("Error");
     
 }
 
@@ -42,8 +67,8 @@ int main(int ac, char **av, char **envp)
 {
     j_dtin pp;
     
-    pp.infile_fd = open(ag[1], O_RDONLY);
-    pp.outfile_fd = open(ag[4], O_CREAT | O_RDWR, 0644);
+    pp.infile_fd = open(av[1], O_RDONLY, 0777);
+    pp.outfile_fd = open(av[4], O_CREAT | O_RDWR, 0777);
     if (pp.infile_fd < 0 || pp.outfile_fd < 0)
     {
         perror("Failed to open files");

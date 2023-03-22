@@ -6,7 +6,7 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 15:58:19 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/22 18:23:13 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/22 18:59:56 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,10 @@ typedef struct i_dtin
     char    **full_path;
     char    **cmd1;
     char    **cmd2;
+    char    *cmdpath;
 }               j_dtin;
 
+#endif
 
 
 
