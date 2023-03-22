@@ -6,11 +6,12 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 18:06:43 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/22 19:02:35 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/22 22:25:34 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
 char    *check_cmd_path(char **fullpath, char *path)
 {
     int i;
@@ -18,7 +19,7 @@ char    *check_cmd_path(char **fullpath, char *path)
     i = 0;
     if (access(path, X_OK) == 0)
         return (path);
-    path = strjoin("/", path);
+    path = ft_strjoin("/", path);
     while (fullpath[i])
 	{
 		fullpath[i] = ft_strjoin(fullpath[i], path);
@@ -29,7 +30,7 @@ char    *check_cmd_path(char **fullpath, char *path)
 	return (NULL);
 }
 
-void    **executing_cmd1(j_dtin fd, char **av, j_dtin *pp, char **envp)
+void   executing_cmd1(char **av, j_dtin *pp, char **envp)
 {
     pp->cmd1 = ft_split(av[2], ' ');
     pp->cmdpath = check_cmd_path(envp, pp->cmd1[0]);
@@ -43,6 +44,20 @@ void    **executing_cmd1(j_dtin fd, char **av, j_dtin *pp, char **envp)
     
 }
 
+void   executing_cmd2(char **av, j_dtin *pp, char **envp)
+{
+    pp->cmd2 = ft_split(av[3], ' ');
+    pp->cmdpath = check_cmd_path(envp, pp->cmd2[0]);
+    if (pp->cmdpath == NULL)
+	{
+		perror("Command not found");
+		exit (1);
+	}
+    if (execve(pp->cmdpath, pp->cmd2, NULL) == -1)
+		perror("Error");
+    
+}
+
 char    **get_env_path( char **envp, j_dtin *pp)
 {
 	int		i;
@@ -50,7 +65,7 @@ char    **get_env_path( char **envp, j_dtin *pp)
 	i = 0;
 	while (envp[i])
 	{
-		if (ft_strnstr(envp[i], "PATH", 5))
+		if (strnstr(envp[i], "PATH", 5))
 			break ;
 		i++;
 	}
@@ -67,7 +82,7 @@ int main(int ac, char **av, char **envp)
 {
     j_dtin pp;
     
-    pp.infile_fd = open(av[1], O_RDONLY, 0777);
+    pp.infile_fd = open(av[1], O_RDONLY | O_CREAT, 0777);
     pp.outfile_fd = open(av[4], O_CREAT | O_RDWR, 0777);
     if (pp.infile_fd < 0 || pp.outfile_fd < 0)
     {
@@ -93,11 +108,34 @@ int main(int ac, char **av, char **envp)
         }
         close(pp.end[0]);
         close(pp.infile_fd);
-        envp = get_path(envp, pp);
+        envp = get_env_path(envp, &pp);
         if (envp == NULL)
             perror("path couldn't found");
-        execute_cmd1(pp.end, av, pp, envp);        
+        executing_cmd1(av, &pp, envp);        
         
     }
+    waitpid(pp.pid1,NULL,0);
+    if ((pp.pid2 = fork()) < 0)
+    {
+        perror("fork failed");
+        exit(0);
+    }
+    if (pp.pid2 == 0)
+    {
+        if(dup2(pp.outfile_fd, STDOUT_FILENO) < 0 || dup2(pp.end[0], STDIN_FILENO) < 0)
+        {
+            perror("dup2 infile or end[0] failed");
+            exit(0);        
+        }
+        close(pp.end[1]);
+        close(pp.outfile_fd);
+        envp = get_env_path(envp, &pp);
+        if (envp == NULL)
+            perror("path couldn't found");
+        executing_cmd1(av, &pp, envp); 
+               
+        
+    }
+    waitpid(pp.pid2,NULL,0);
     return (0);
 }
