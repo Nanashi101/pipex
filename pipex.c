@@ -6,7 +6,7 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 18:06:43 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/22 22:25:34 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/22 22:36:02 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void   executing_cmd1(char **av, j_dtin *pp, char **envp)
 		exit (1);
 	}
     if (execve(pp->cmdpath, pp->cmd1, NULL) == -1)
-		perror("Error");
+		perror("Exec Error");
     
 }
 
@@ -54,7 +54,10 @@ void   executing_cmd2(char **av, j_dtin *pp, char **envp)
 		exit (1);
 	}
     if (execve(pp->cmdpath, pp->cmd2, NULL) == -1)
-		perror("Error");
+	{
+		perror("Exec Error");
+		exit (1);
+	}
     
 }
 
@@ -83,7 +86,7 @@ int main(int ac, char **av, char **envp)
     j_dtin pp;
     
     pp.infile_fd = open(av[1], O_RDONLY | O_CREAT, 0777);
-    pp.outfile_fd = open(av[4], O_CREAT | O_RDWR, 0777);
+    pp.outfile_fd = open(av[4], O_CREAT | O_RDWR | O_TRUNC, 0777);
     if (pp.infile_fd < 0 || pp.outfile_fd < 0)
     {
         perror("Failed to open files");
