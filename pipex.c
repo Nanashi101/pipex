@@ -6,11 +6,24 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 18:06:43 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/22 22:36:02 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/24 07:17:03 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+char	**free_all(char **s, size_t i)
+{
+	while (i >= 0 && s[i] != NULL)
+	{
+		free(s[i]);
+		s[i] = NULL;
+		i--;
+	}
+	free(s);
+	s = NULL;
+	return (NULL);
+}
 
 char    *check_cmd_path(char **fullpath, char *path)
 {
@@ -40,7 +53,10 @@ void   executing_cmd1(char **av, j_dtin *pp, char **envp)
 		exit (1);
 	}
     if (execve(pp->cmdpath, pp->cmd1, NULL) == -1)
-		perror("Exec Error");
+	{
+        perror("Exec cmd1 Error");
+        exit(1);
+    }
     
 }
 
@@ -55,7 +71,7 @@ void   executing_cmd2(char **av, j_dtin *pp, char **envp)
 	}
     if (execve(pp->cmdpath, pp->cmd2, NULL) == -1)
 	{
-		perror("Exec Error");
+		perror("Exec cmd2 Error");
 		exit (1);
 	}
     
@@ -114,16 +130,15 @@ int main(int ac, char **av, char **envp)
         envp = get_env_path(envp, &pp);
         if (envp == NULL)
             perror("path couldn't found");
-        executing_cmd1(av, &pp, envp);        
-        
+        executing_cmd1(av, &pp, envp); 
+        close(pp.end[1]);
     }
-    waitpid(pp.pid1,NULL,0);
     if ((pp.pid2 = fork()) < 0)
     {
         perror("fork failed");
         exit(0);
     }
-    if (pp.pid2 == 0)
+     if (pp.pid2 == 0)
     {
         if(dup2(pp.outfile_fd, STDOUT_FILENO) < 0 || dup2(pp.end[0], STDIN_FILENO) < 0)
         {
@@ -135,10 +150,9 @@ int main(int ac, char **av, char **envp)
         envp = get_env_path(envp, &pp);
         if (envp == NULL)
             perror("path couldn't found");
-        executing_cmd1(av, &pp, envp); 
-               
-        
+        executing_cmd2(av, &pp, envp); 
+        close(pp.end[0]);
     }
-    waitpid(pp.pid2,NULL,0);
+    wait(NULL);
     return (0);
 }

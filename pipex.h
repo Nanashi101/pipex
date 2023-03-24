@@ -6,7 +6,7 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 15:58:19 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/22 22:21:49 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/22 22:50:29 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <fcntl.h>
-# include "ft_printf/ft_printf.h"
  #include <sys/wait.h>
       #include <string.h> 
 typedef struct i_dtin
