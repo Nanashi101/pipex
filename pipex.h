@@ -6,7 +6,7 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 15:58:19 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/24 10:18:03 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/26 22:23:56 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <unistd.h>
 # include <sys/types.h>
 # include <fcntl.h>
-# include <sys/wait.h> 
+# include <sys/wait.h>
 
 typedef struct i_dtin
 {

@@ -6,7 +6,7 @@
 #    By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/24 09:37:12 by jael-mor          #+#    #+#              #
-#    Updated: 2023/03/24 10:22:26 by jael-mor         ###   ########.fr        #
+#    Updated: 2023/03/26 22:24:07 by jael-mor         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ OBJ = ${SRCS:.c=.o}
 all: ${NAME}
 ${NAME}: ${OBJ} ${HEADER}
 		${CC} ${FLAGS} ${OBJ} -o ${NAME}
-%.o: %.c
+%.o: %.c ${HEADER}
 	${CC} ${FLAGS} -c $< -o $@
 
 clean: 

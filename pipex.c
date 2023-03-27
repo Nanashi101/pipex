@@ -6,26 +6,11 @@
 /*   By: jael-mor <jael-mor@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 18:06:43 by jael-mor          #+#    #+#             */
-/*   Updated: 2023/03/24 10:23:02 by jael-mor         ###   ########.fr       */
+/*   Updated: 2023/03/26 03:12:50 by jael-mor         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void	free_all(char **str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		free(str[i]);
-		str[i] = NULL;
-		i++;
-	}
-	free(str);
-	str = NULL;
-}
 
 char	*check_cmd_path(char **fullpath, char *path)
 {
@@ -71,17 +56,19 @@ int	main(int ac, char **av, char **envp)
 
 	if (ac == 5)
 	{
-		pp.infile_fd = open(av[1], O_RDONLY | O_CREAT, 0777);
+		pp.infile_fd = open(av[1], O_RDWR, 0777);
 		pp.outfile_fd = open(av[4], O_CREAT | O_RDWR | O_TRUNC, 0777);
 		if (pp.infile_fd < 0 || pp.outfile_fd < 0)
 		{
-			perror("Failed to open files");
-			exit(0);
+			write(2, "no such file or directory : ", 28);
+			write(2, av[1], ft_strlen(av[1]));
+			write(2, "\n", 1);
+			exit(1);
 		}
-		if (pipe(pp.end))
+		if (pipe(pp.end) < 0)
 		{
 			perror("Pipe failed");
-			exit(0);
+			exit(1);
 		}
 		child_process1(&pp, av, envp);
 		child_process2(&pp, av, envp);
